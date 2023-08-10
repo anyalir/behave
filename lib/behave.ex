@@ -11,27 +11,36 @@ defmodule Behave do
     end |> mdbg
   end
 
-  @spec scenario(any, [{:do, any}, ...]) ::
-          nonempty_binary
-          | {:import, [{atom, any}, ...], [{any, any, any}, ...]}
-          | {:test, [{atom, any}, ...], [...]}
   defmacro scenario(title, do: block) do
     quote do
       test unquote(title) do
-        Behave.Scenario.new()
-        |> unquote(block)
+        var!(scenario) = Behave.Scenario.new()
+        unquote(block)
+        Behave.Scenario.run(var!(scenario))
       end
     end |> mdbg()
   end
 
-  defmacro given(description) do
+  defmacro given(fun, args \\ []) do
     quote do
-      unquote("|> given_" <> Macro.underscore(description))
+      var!(scenario) = Behave.__given__(var!(scenario), unquote(fun), unquote(args))
     end |> mdbg
   end
 
+  defmacro act(fun, args \\ []) do
+    quote do
+      var!(scenario) = Behave.__act__(var!(scenario), unquote(fun), unquote(args))
+    end |> mdbg
+  end
+
+  defmacro check(fun, args \\ []) do
+    quote do
+      var!(scenario) = Behave.__check__(var!(scenario), unquote(fun), unquote(args))
+    end |> mdbg
+  end
   defp mdbg(macro) do
     IO.puts(Macro.to_string(macro))
+    dbg()
     macro
   end
 
@@ -39,11 +48,11 @@ defmodule Behave do
     update_in(scenario.steps, &[{:given, step, args} | &1])
   end
 
-  def __when__(scenario = %Scenario{}, step, args \\ []) do
-    update_in(scenario.steps, &[{:when, step, args} | &1])
+  def __act__(scenario = %Scenario{}, step, args \\ []) do
+    update_in(scenario.steps, &[{:act, step, args} | &1])
   end
 
-  def __then__(scenario = %Scenario{}, step, args \\ []) do
-    update_in(scenario.steps, &[{:then, step, args} | &1])
+  def __check__(scenario = %Scenario{}, step, args \\ []) do
+    update_in(scenario.steps, &[{:check, step, args} | &1])
   end
 end

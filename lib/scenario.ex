@@ -16,11 +16,11 @@ defmodule Behave.Scenario do
     fun.(scenario, args)
   end
 
-  def run_step({:when, fun, args}, scenario = %__MODULE__{}) do
+  def run_step({:act, fun, args}, scenario = %__MODULE__{}) do
     fun.(scenario, args)
   end
 
-  def run_step({:then, fun, args}, scenario = %__MODULE__{}) do
+  def run_step({:check, fun, args}, scenario = %__MODULE__{}) do
     fun.(scenario, args)
   end
 end
