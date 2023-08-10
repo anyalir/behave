@@ -35,15 +35,15 @@ defmodule Behave do
     macro
   end
 
-  def __given__(scenario = %Scenario{}, step) do
-    update_in(scenario.steps, &[{:given, step} | &1])
+  def __given__(scenario = %Scenario{}, step, args \\ []) do
+    update_in(scenario.steps, &[{:given, step, args} | &1])
   end
 
-  def __when__(scenario = %Scenario{}, step) do
-    update_in(scenario.steps, &[{:when, step} | &1])
+  def __when__(scenario = %Scenario{}, step, args \\ []) do
+    update_in(scenario.steps, &[{:when, step, args} | &1])
   end
 
-  def __then__(scenario = %Scenario{}, step) do
-    update_in(scenario.steps, &[{:then, step} | &1])
+  def __then__(scenario = %Scenario{}, step, args \\ []) do
+    update_in(scenario.steps, &[{:then, step, args} | &1])
   end
 end

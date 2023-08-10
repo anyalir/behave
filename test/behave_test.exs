@@ -6,22 +6,21 @@ defmodule BehaveTest do
 
   import TestSteps
 
-  # scenario "make coffee" do
-  #   given_coffee_machine
-  #   |> given_it_has_water
-  #   |> given_it_has_coffee
-  #   |> when_i_press_the_button
-  #   |> then_it_makes_coffee
-  #   |> Behave.Scenario.run
-  # end
+   scenario "make coffee with dsl" do
+    scenario = Behave.__given__(scenario, &given_coffee_machine/2)
+    scenario = Behave.__given__(scenario, &given_it_has_water/2, [250])
+    scenario = Behave.__given__(scenario, &given_it_has_coffee/2, [:java])
+    scenario = Behave.__when__(scenario, &when_i_press_the_button/2)
+    scenario = Behave.__then__(scenario, &then_it_makes_coffee/2)
+   end
 
   test "make coffee explicitly" do
     scenario = Scenario.new()
-    scenario = Behave.__given__(scenario, &given_coffee_machine/1)
-    scenario = Behave.__given__(scenario, &given_it_has_water/1)
-    scenario = Behave.__given__(scenario, &given_it_has_coffee/1)
-    scenario = Behave.__when__(scenario, &when_i_press_the_button/1)
-    scenario = Behave.__then__(scenario, &then_it_makes_coffee/1)
+    scenario = Behave.__given__(scenario, &given_coffee_machine/2)
+    scenario = Behave.__given__(scenario, &given_it_has_water/2, [250])
+    scenario = Behave.__given__(scenario, &given_it_has_coffee/2, [:java])
+    scenario = Behave.__when__(scenario, &when_i_press_the_button/2)
+    scenario = Behave.__then__(scenario, &then_it_makes_coffee/2)
     Scenario.run(scenario)
   end
 
