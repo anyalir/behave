@@ -130,7 +130,7 @@ by adding `behave_bdd` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:behave_bdd, "~> 0.1.0"}
+    {:behave_bdd, "~> 0.1.1"}
   ]
 end
 ```
