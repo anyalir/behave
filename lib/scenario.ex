@@ -40,8 +40,8 @@ defmodule Behave.Scenario do
     put_in(scenario.data[key], datum)
   end
 
-  def __given__(_scenario, :ignore) do
-    :ok
+  def __given__(scenario, :ignore) do
+    scenario
   end
 
   def __given__(_scenario, _) do
@@ -81,8 +81,8 @@ defmodule Behave.Scenario do
     put_in(scenario.results[key], datum)
   end
 
-  def __act__(_scenario, :ignore) do
-    :ok
+  def __act__(scenario, :ignore) do
+    scenario
   end
 
   def __act__(_scenario, _) do
