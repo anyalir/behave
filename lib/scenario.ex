@@ -10,18 +10,21 @@ defmodule Behave.Scenario do
   @spec new :: %Behave.Scenario{data: [], results: [], steps: []}
   def new, do: %__MODULE__{}
 
-  defmacro given(name, args) do
+  defmacro given(name, do: block) do
     name = Behave.string_to_function_name("given_#{name}")
-    block = Keyword.get(args, :do)
-
-    args_without_do =
-      args
-      |> Enum.filter(fn {key, _} ->
-        key != :do
-      end)
-
     quote do
-      def unquote(name)(scenario, unquote(args_without_do)) do
+      def unquote(name)(scenario, _) do
+        result = unquote(block)
+        Behave.Scenario.__given__(scenario, result)
+      end
+    end
+    |> Behave.mdbg()
+  end
+
+  defmacro given(name, args, do: block) do
+    name = Behave.string_to_function_name("given_#{name}")
+    quote do
+      def unquote(name)(scenario, unquote(args)) do
         result = unquote(block)
         Behave.Scenario.__given__(scenario, result)
       end
