@@ -95,16 +95,6 @@ This is useful if you want to execute a `given` just for it's side effects. Note
 If you pass in a function as the second argument of the tuple, it will execute the function and pass in the value of the key, if it has been set by a prior step.
 The value will be overwritten with this function's return value, similar to how `update_in` works.
 
-`given`s also have access to all keys defined before, via an injected `data` map. So the above could be written like this:
-
-```elixir
-
-    given "it has water", amount: amount do
-      {:coffee_machine, data.coffee_machine |> CoffeeMachine.add_water(amount) }
-    end
-
-```
-
 `act` works similarly, but the keys it returns will be separated from the keys that the `given` steps have prepared. `act` also has access to all values set in prior
 givens through an injected `data` map:
 
