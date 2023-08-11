@@ -103,7 +103,8 @@ defmodule Behave.Scenario do
   defmacro check(name, args, do: block) do
     name = Behave.string_to_function_name("check_#{name}")
     quote do
-      def unquote(name)(scenario = %Behave.Scenario{results: r}, unquote(args)) do
+      def unquote(name)(scenario = %Behave.Scenario{data: d, results: r}, unquote(args)) do
+        var!(data) = Map.new(d)
         var!(results) = Map.new(r)
         unquote(block)
         scenario
