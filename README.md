@@ -1,5 +1,6 @@
 # Behave
 > Behaviour driven development for ExUnit with product management friendly readable scenarios.
+
 ![Behave, baby, behave!](https://i.giphy.com/3o7bu1iM5MSwG2y7NS.gif)
 
 ## Features
