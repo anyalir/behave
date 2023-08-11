@@ -18,8 +18,7 @@ defmodule TestSteps do
       {:coffee, CoffeeMachine.brew(data.coffee_machine)}
     end
 
-    def check_it_makes_coffee(scenario, _args) do
-      assert scenario.results[:coffee] != :disappointment
-      scenario |> dbg
+    check "it makes coffee" do
+      assert results.coffee != :disappointment
     end
 end

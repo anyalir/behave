@@ -89,6 +89,30 @@ defmodule Behave.Scenario do
     raise "Act needs to return a {:key, value} tuple or :ignore for executing side effects."
   end
 
+  defmacro check(name, do: block) do
+    name = Behave.string_to_function_name("check_#{name}")
+
+    quote do
+      def unquote(name)(scenario = %Behave.Scenario{results: r}, _) do
+        var!(results) = Map.new(r)
+        unquote(block)
+        scenario
+      end
+    end
+    |> Behave.mdbg()
+  end
+
+  defmacro check(name, args, do: block) do
+    name = Behave.string_to_function_name("check_#{name}")
+    quote do
+      def unquote(name)(scenario = %Behave.Scenario{results: r}, unquote(args)) do
+        var!(results) = Map.new(r)
+        unquote(block)
+        scenario
+      end
+    end
+  end
+
   def run(scenario = %__MODULE__{steps: steps}) do
     steps
     |> Enum.reverse()
