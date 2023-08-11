@@ -61,11 +61,6 @@ defmodule Behave do
     end
   end
 
-  def mdbg(macro) do
-    IO.puts(Macro.to_string(macro))
-    macro
-  end
-
   def __given__(scenario = %Scenario{}, step, args \\ []) do
     update_in(scenario.steps, &[{:given, step, args} | &1])
   end
