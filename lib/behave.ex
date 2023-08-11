@@ -5,10 +5,22 @@ defmodule Behave do
   """
   alias Behave.Scenario
 
-  defmacro __using__(_opts) do
+  defmacro __using__(opts) do
+    step_modules = Keyword.get(opts, :steps)
+
+    if step_modules == nil do
+      raise "Please specify your step implementation modules like so: use Behave, steps: [MyTestSteps, MyOtherTestSteps]."
+    end
+
+    imports =
+      for module <- step_modules do
+        quote do: import(unquote(module))
+      end
+
     quote do
       import Behave
       alias Behave.Scenario
+      unquote_splicing(imports)
     end
   end
 

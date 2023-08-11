@@ -1,8 +1,6 @@
 defmodule BehaveDslTest do
-  use Behave
+  use Behave, steps: [TestSteps]
   use ExUnit.Case
-
-  import TestSteps
 
   scenario "make coffee with dsl" do
     given "coffee machine"

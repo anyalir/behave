@@ -58,7 +58,6 @@ defmodule Behave.Scenario do
         Behave.Scenario.__act__(scenario, result)
       end
     end
-    |> Behave.mdbg()
   end
 
   defmacro act(name, args, do: block) do
@@ -99,7 +98,6 @@ defmodule Behave.Scenario do
         scenario
       end
     end
-    |> Behave.mdbg()
   end
 
   defmacro check(name, args, do: block) do
