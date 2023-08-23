@@ -56,6 +56,7 @@ defmodule Behave.Scenario do
     quote do
       def unquote(name)(scenario, _) do
         var!(data) = scenario.data
+        _ = var!(data)
         result = unquote(block)
         Behave.Scenario.__act__(scenario, result)
       end
@@ -68,6 +69,7 @@ defmodule Behave.Scenario do
     quote do
       def unquote(name)(scenario, unquote(args)) do
         var!(data) = scenario.data
+        _ = var!(data)
         result = unquote(block)
         Behave.Scenario.__act__(scenario, result)
       end
@@ -98,6 +100,8 @@ defmodule Behave.Scenario do
       def unquote(name)(scenario, _) do
         var!(data) = scenario.data
         var!(results) = scenario.results
+        _ = var!(data)
+        _ = var!(results)
         unquote(block)
         scenario
       end
@@ -111,6 +115,8 @@ defmodule Behave.Scenario do
       def unquote(name)(scenario, unquote(args)) do
         var!(data) = scenario.data
         var!(results) = scenario.results
+        _ = var!(data)
+        _ = var!(results)
         unquote(block)
         scenario
       end
