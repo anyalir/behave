@@ -5,9 +5,11 @@ defmodule Behave.Scenario do
     end
   end
 
-  defstruct steps: [], data: [], results: []
+  defstruct steps: [], data: %{}, results: %{}
 
-  @spec new :: %Behave.Scenario{data: [], results: [], steps: []}
+  @type t :: %__MODULE__{}
+
+  @spec new :: t
   def new, do: %__MODULE__{}
 
   defmacro given(name, do: block) do
@@ -52,8 +54,8 @@ defmodule Behave.Scenario do
     name = Behave.string_to_function_name("act_#{name}")
 
     quote do
-      def unquote(name)(scenario = %Behave.Scenario{data: d}, _) do
-        var!(data) = Map.new(d)
+      def unquote(name)(scenario, _) do
+        var!(data) = scenario.data
         result = unquote(block)
         Behave.Scenario.__act__(scenario, result)
       end
@@ -62,9 +64,10 @@ defmodule Behave.Scenario do
 
   defmacro act(name, args, do: block) do
     name = Behave.string_to_function_name("act_#{name}")
+
     quote do
-      def unquote(name)(scenario = %Behave.Scenario{data: d}, unquote(args)) do
-        var!(data) = Map.new(d)
+      def unquote(name)(scenario, unquote(args)) do
+        var!(data) = scenario.data
         result = unquote(block)
         Behave.Scenario.__act__(scenario, result)
       end
@@ -92,8 +95,8 @@ defmodule Behave.Scenario do
     name = Behave.string_to_function_name("check_#{name}")
 
     quote do
-      def unquote(name)(scenario = %Behave.Scenario{results: r}, _) do
-        var!(results) = Map.new(r)
+      def unquote(name)(scenario, _) do
+        var!(results) = scenario.results
         unquote(block)
         scenario
       end
@@ -102,10 +105,11 @@ defmodule Behave.Scenario do
 
   defmacro check(name, args, do: block) do
     name = Behave.string_to_function_name("check_#{name}")
+
     quote do
-      def unquote(name)(scenario = %Behave.Scenario{data: d, results: r}, unquote(args)) do
-        var!(data) = Map.new(d)
-        var!(results) = Map.new(r)
+      def unquote(name)(scenario, unquote(args)) do
+        var!(data) = scenario.data
+        var!(results) = scenario.results
         unquote(block)
         scenario
       end
