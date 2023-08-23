@@ -96,6 +96,7 @@ defmodule Behave.Scenario do
 
     quote do
       def unquote(name)(scenario, _) do
+        var!(data) = scenario.data
         var!(results) = scenario.results
         unquote(block)
         scenario
