@@ -4,6 +4,7 @@ defmodule BehaveExplicitTest do
   use ExUnit.Case
 
   import TestSteps
+
   test "make coffee explicitly" do
     Scenario.new()
     |> Behave.__given__(&given_coffee_machine/2)
