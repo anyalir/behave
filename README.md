@@ -124,13 +124,13 @@ All that said and done, just run your test like any ExUnit test 🎉
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
+The package is available on [hex.pm](https://hex.pm/packages/behave_bdd) and can be installed
 by adding `behave_bdd` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:behave_bdd, "~> 0.1.1"}
+    {:behave_bdd, "~> 0.1.2"}
   ]
 end
 ```
