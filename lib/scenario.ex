@@ -93,30 +93,12 @@ defmodule Behave.Scenario do
     raise "Act needs to return a {:key, value} tuple or :ignore for executing side effects."
   end
 
-  defmacro check(name, do: block) do
-    name = Behave.string_to_function_name("check_#{name}")
-
-    quote do
-      def unquote(name)(scenario, _) do
-        var!(data) = scenario.data
-        var!(results) = scenario.results
-        _ = var!(data)
-        _ = var!(results)
-        unquote(block)
-        scenario
-      end
-    end
-  end
-
-  defmacro check(name, args, do: block) do
+  defmacro check(name, args \\ Macro.escape([]), assign \\ Macro.escape(%{}), do: block) do
     name = Behave.string_to_function_name("check_#{name}")
 
     quote do
       def unquote(name)(scenario, unquote(args)) do
-        var!(data) = scenario.data
-        var!(results) = scenario.results
-        _ = var!(data)
-        _ = var!(results)
+        unquote(assign) = scenario
         unquote(block)
         scenario
       end

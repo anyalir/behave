@@ -18,7 +18,7 @@ defmodule TestSteps do
     {:coffee, CoffeeMachine.brew(data.coffee_machine)}
   end
 
-  check "it makes coffee" do
+  check "it makes coffee", [], %Behave.Scenario{results: results} do
     assert results.coffee != :disappointment
   end
 end
