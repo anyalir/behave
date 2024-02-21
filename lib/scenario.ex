@@ -10,24 +10,14 @@ defmodule Behave.Scenario do
   @type t :: %__MODULE__{}
 
   @spec new :: t
-  def new, do: %__MODULE__{}
+  def new(data \\ %{}), do: %__MODULE__{data: data}
 
-  defmacro given(name, do: block) do
-    name = Behave.string_to_function_name("given_#{name}")
-
-    quote do
-      def unquote(name)(scenario, _) do
-        result = unquote(block)
-        Behave.Scenario.__given__(scenario, result)
-      end
-    end
-  end
-
-  defmacro given(name, args, do: block) do
+  defmacro given(name, args \\ Macro.escape([]), assign \\ Macro.escape(%{}), do: block) do
     name = Behave.string_to_function_name("given_#{name}")
 
     quote do
       def unquote(name)(scenario, unquote(args)) do
+        unquote(assign) = scenario
         result = unquote(block)
         Behave.Scenario.__given__(scenario, result)
       end
@@ -50,26 +40,12 @@ defmodule Behave.Scenario do
     raise "Given needs to return a {:key, value} tuple or :ignore for executing side effects."
   end
 
-  defmacro act(name, do: block) do
-    name = Behave.string_to_function_name("act_#{name}")
-
-    quote do
-      def unquote(name)(scenario, _) do
-        var!(data) = scenario.data
-        _ = var!(data)
-        result = unquote(block)
-        Behave.Scenario.__act__(scenario, result)
-      end
-    end
-  end
-
-  defmacro act(name, args, do: block) do
+  defmacro act(name, args \\ Macro.escape([]), assign \\ Macro.escape(%{}), do: block) do
     name = Behave.string_to_function_name("act_#{name}")
 
     quote do
       def unquote(name)(scenario, unquote(args)) do
-        var!(data) = scenario.data
-        _ = var!(data)
+        unquote(assign) = scenario
         result = unquote(block)
         Behave.Scenario.__act__(scenario, result)
       end
@@ -93,30 +69,12 @@ defmodule Behave.Scenario do
     raise "Act needs to return a {:key, value} tuple or :ignore for executing side effects."
   end
 
-  defmacro check(name, do: block) do
-    name = Behave.string_to_function_name("check_#{name}")
-
-    quote do
-      def unquote(name)(scenario, _) do
-        var!(data) = scenario.data
-        var!(results) = scenario.results
-        _ = var!(data)
-        _ = var!(results)
-        unquote(block)
-        scenario
-      end
-    end
-  end
-
-  defmacro check(name, args, do: block) do
+  defmacro check(name, args \\ Macro.escape([]), assign \\ Macro.escape(%{}), do: block) do
     name = Behave.string_to_function_name("check_#{name}")
 
     quote do
       def unquote(name)(scenario, unquote(args)) do
-        var!(data) = scenario.data
-        var!(results) = scenario.results
-        _ = var!(data)
-        _ = var!(results)
+        unquote(assign) = scenario
         unquote(block)
         scenario
       end

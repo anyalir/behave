@@ -1,9 +1,10 @@
 defmodule TestSteps do
+  use ExUnit.Case
   use Behave.Scenario
   import ExUnit.Assertions
 
-  given "coffee machine" do
-    {:coffee_machine, CoffeeMachine.new()}
+  given "coffee machine", [], %Behave.Scenario{data: %{name: name}} do
+    {:coffee_machine, CoffeeMachine.new(name)}
   end
 
   given "it has water", amount: amount do
@@ -14,11 +15,11 @@ defmodule TestSteps do
     {:coffee_machine, &CoffeeMachine.add_coffee(&1, cultivar)}
   end
 
-  act "i press the button" do
+  act "i press the button", [], %Behave.Scenario{data: data} do
     {:coffee, CoffeeMachine.brew(data.coffee_machine)}
   end
 
-  check "it makes coffee" do
+  check "it makes coffee", [], %Behave.Scenario{results: results} do
     assert results.coffee != :disappointment
   end
 end
