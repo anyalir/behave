@@ -3,10 +3,10 @@ defmodule CoffeeMachine do
   A simulation of a coffee machine.
   The coffee machine is modeled as a finite state machine, just to have some code to run simulated tests against.
   """
-  defstruct coffee: nil, water_ml: 0
+  defstruct name: nil, coffee: nil, water_ml: 0
 
-  @spec new :: %CoffeeMachine{coffee: nil, water_ml: 0}
-  def new, do: %__MODULE__{}
+  @spec new(String.t()) :: %CoffeeMachine{}
+  def new(name), do: %__MODULE__{name: name}
 
   @spec add_water(%CoffeeMachine{}, number) :: %CoffeeMachine{}
   def add_water(machine = %__MODULE__{}, amount) when is_number(amount) do

@@ -5,8 +5,12 @@ defmodule BehaveExplicitTest do
 
   import TestSteps
 
-  test "make coffee explicitly" do
-    Scenario.new()
+  setup do
+    [name: "dsl_coffee_machine"]
+  end
+
+  test "make coffee explicitly", args do
+    Scenario.new(args)
     |> Behave.__given__(&given_coffee_machine/2)
     |> Behave.__given__(&given_it_has_water/2, amount: 259)
     |> Behave.__given__(&given_it_has_coffee/2, cultivar: :crappy_robusta)

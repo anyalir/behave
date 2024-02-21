@@ -26,8 +26,8 @@ defmodule Behave do
 
   defmacro scenario(title, do: block) do
     quote do
-      test unquote(title) do
-        var!(scenario) = Behave.Scenario.new()
+      test unquote(title), args do
+        var!(scenario) = Behave.Scenario.new(args)
         unquote(block)
         Behave.Scenario.run(var!(scenario))
       end
