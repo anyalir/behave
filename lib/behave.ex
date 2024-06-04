@@ -1,104 +1,115 @@
+defmodule BehaveError do
+  @moduledoc false
+  defexception [:message]
+end
+
 defmodule Behave do
   @moduledoc """
   ~Ugh baby, `Behave`!
   Simple BDD style tests for elixir.
   """
-  alias Behave.Scenario
 
-  defmacro __using__(opts) do
-    step_modules = Keyword.get(opts, :steps)
+  defmacro __using__(opts \\ []) do
+    file = Keyword.get(opts, :file)
 
-    if step_modules == nil do
-      raise "Please specify your step implementation modules like so: use Behave, steps: [MyTestSteps, MyOtherTestSteps]."
+    unless file do
+      raise BehaveError,
+        message: "Behave expect a `file` option."
     end
 
-    imports =
-      for module <- step_modules do
-        quote do: import(unquote(module))
-      end
+    unless String.ends_with?(file, ".feature") || File.exists?(file) do
+      raise BehaveError,
+        message: "Behave expect the passed path to be .feature file"
+    end
 
     quote do
-      import Behave
-      alias Behave.Scenario
-      unquote_splicing(imports)
+      import unquote(__MODULE__)
+
+      Module.put_attribute(__MODULE__, :feature_file, unquote(file))
+      Module.register_attribute(__MODULE__, :feature, accumulate: false)
+
+      Module.put_attribute(__MODULE__, :before_compile, {unquote(__MODULE__), :load_features})
+      Module.put_attribute(__MODULE__, :before_compile, {unquote(__MODULE__), :build_test_suite})
     end
   end
 
-  defmacro scenario(title, do: block) do
-    quote do
-      test unquote(title) do
-        var!(scenario) = Behave.Scenario.new()
-        unquote(block)
-        Behave.Scenario.run(var!(scenario))
-      end
+  defmacro load_features(%{module: module}) do
+    quote bind_quoted: [module: module] do
+      Module.get_attribute(module, :feature_file)
+      |> File.stream!()
+      |> Gherkin.parse()
+      |> then(&Module.put_attribute(module, :feature, &1))
     end
   end
 
-  defmacro given(name, args \\ []) do
-    {module, name, arity} = find_target_fun(__CALLER__.requires, "given " <> name)
-    fun = Function.capture(module, name, arity)
+  defmacro build_test_suite(%{module: module}) do
+    feature = Module.get_attribute(module, :feature)
 
-    quote do
-      var!(scenario) = Behave.__given__(var!(scenario), unquote(fun), unquote(args))
-    end
-  end
+    quote bind_quoted: [feature: Macro.escape(feature)] do
+      Enum.each(feature.scenarios, fn scenario ->
+        name =
+          ExUnit.Case.register_test(__ENV__, :scenario, scenario.name, feature.tags)
 
-  defmacro act(name, args \\ []) do
-    {module, name, arity} = find_target_fun(__CALLER__.requires, "act " <> name)
-    fun = Function.capture(module, name, arity)
+        steps = feature.background_steps ++ scenario.steps
 
-    quote do
-      var!(scenario) = Behave.__act__(var!(scenario), unquote(fun), unquote(args))
-    end
-  end
+        def unquote(name)(context) do
+          Enum.reduce(unquote(Macro.escape(steps)), context, fn step, acc ->
+            apply(__MODULE__, String.to_atom(step.text), [acc])
+            |> case do
+              {:ok, result} ->
+                Map.merge(acc, Map.new(result))
 
-  defmacro check(name, args \\ []) do
-    {module, name, arity} = find_target_fun(__CALLER__.requires, "check " <> name)
-    fun = Function.capture(module, name, arity)
-
-    quote do
-      var!(scenario) = Behave.__check__(var!(scenario), unquote(fun), unquote(args))
-    end
-  end
-
-  def __given__(scenario = %Scenario{}, step, args \\ []) do
-    update_in(scenario.steps, &[{:given, step, args} | &1])
-  end
-
-  def __act__(scenario = %Scenario{}, step, args \\ []) do
-    update_in(scenario.steps, &[{:act, step, args} | &1])
-  end
-
-  def __check__(scenario = %Scenario{}, step, args \\ []) do
-    update_in(scenario.steps, &[{:check, step, args} | &1])
-  end
-
-  defp find_target_fun(modules, name) do
-    atom_name = string_to_function_name(name)
-
-    function_name_predicate = fn {name, _arity} -> name == atom_name end
-
-    target_module =
-      modules
-      |> Enum.find(fn module ->
-        module.__info__(:functions) |> Enum.any?(function_name_predicate)
+              _else ->
+                acc
+            end
+          end)
+        rescue
+          e in UndefinedFunctionError ->
+            raise BehaveError, "Undefined step: `#{e.function}`"
+        end
       end)
-
-    if target_module == nil do
-      raise "Tried to find a step implementation for \"#{name}\", but none were defined. Did you forget an import?"
     end
-
-    {target_function_name, target_function_arity} =
-      target_module.__info__(:functions)
-      |> Enum.find(function_name_predicate)
-
-    {target_module, target_function_name, target_function_arity}
   end
 
-  def string_to_function_name(string) do
-    String.downcase(string)
-    |> String.trim()
-    |> String.replace(" ", "_")
-    |> String.to_atom()
+  defmacro background(do: contents) do
+    quote do
+      unquote(contents)
+    end
+  end
+
+  defmacro scenario(_title, do: contents) do
+    quote do
+      unquote(contents)
+    end
+  end
+
+  defmacro given_(message, vars \\ Macro.escape(%{}), do: block) do
+    quote do
+      def unquote(String.to_atom(message))(unquote(vars)), do: unquote(block)
+    end
+  end
+
+  defmacro when_(message, vars \\ Macro.escape(%{}), do: block) do
+    quote do
+      def unquote(String.to_atom(message))(unquote(vars)), do: unquote(block)
+    end
+  end
+
+  defmacro then_(message, vars \\ Macro.escape(%{}), do: block) do
+    quote do
+      def unquote(String.to_atom(message))(unquote(vars)), do: unquote(block)
+    end
+  end
+
+  defmacro and_(message, vars \\ Macro.escape(%{}), do: block) do
+    quote do
+      def unquote(String.to_atom(message))(unquote(vars)), do: unquote(block)
+    end
+  end
+
+  defmacro but_(message, vars \\ Macro.escape(%{}), do: block) do
+    quote do
+      def unquote(String.to_atom(message))(unquote(vars)), do: unquote(block)
+    end
   end
 end
