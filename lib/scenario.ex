@@ -33,6 +33,18 @@ defmodule Behave.Scenario do
       end
     end
   end
+  
+  defmacro given(name, prerequisites, args, do: block) do
+    name = Behave.string_to_function_name("given_#{name}")
+
+    quote do
+      def unquote(name)(scenario, unquote(args)) do
+        unquote(prerequisites) = scenario.data
+        result = unquote(block)
+        Behave.Scenario.__given__(scenario, result)
+      end
+    end
+  end
 
   def __given__(scenario, {key, datum}) when is_function(datum) do
     update_in(scenario.data[key], datum)
