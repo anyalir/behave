@@ -7,14 +7,14 @@ defmodule DereferenceDataSteps do
   end
 
   given "read the random int and copy it", %{first: int}, name: name do
-    {name, int} 
+    {name, int}
   end
-  
+
   act "copy data to results", data, name: name do
     {name, data[name]}
   end
 
-  check "the copies are equal", results do 
+  check "the copies are equal", results do
     assert results.first == results.second
   end
 
@@ -31,7 +31,7 @@ defmodule DereferenceDataSteps do
   end
 
   act "read the data, and an argument, emit results", data, value: it do
-    {:second_result, {data[:second], it}} 
+    {:second_result, {data[:second], it}}
   end
 
   check "results were emitted", results do
@@ -41,7 +41,7 @@ defmodule DereferenceDataSteps do
 
   check "we can compare the result to an argument", results, value: it do
     assert results.first_result == it
-  end 
+  end
 
   check "we can access the data too", _, data do
     assert data.first != nil
@@ -62,7 +62,7 @@ defmodule DereferenceDataSteps do
 
   check "we can compare data and the result to an argument", result, data, value: it do
     assert result.first_result == it
-    assert data.first == it  
+    assert data.first == it
   end
 
   check "we can compare data and the result to several arguments", result, data, one: one, two: two, three: three do

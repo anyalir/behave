@@ -9,7 +9,7 @@ defmodule DereferenceDataTest do
     act "copy data to results", name: :second
     check "the copies are equal"
   end
-  
+
   scenario "extended DSL" do
     given "an argumment", value: :foo
     given "an argument, but the step needs to access data", value: :bar

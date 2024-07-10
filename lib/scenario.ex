@@ -45,7 +45,8 @@ defmodule Behave.Scenario do
     end
   end
 
-  defmacro given(name, data, arguments, do: block) when not is_list(data) and is_list(arguments) do
+  defmacro given(name, data, arguments, do: block)
+           when not is_list(data) and is_list(arguments) do
     name = Behave.string_to_function_name("given_#{name}")
 
     quote do
@@ -123,7 +124,8 @@ defmodule Behave.Scenario do
     end
   end
 
-  defmacro act(name, data, results, arguments, do: block) when not is_list(data) and not is_list(results) and is_list(arguments) do
+  defmacro act(name, data, results, arguments, do: block)
+           when not is_list(data) and not is_list(results) and is_list(arguments) do
     name = Behave.string_to_function_name("act_#{name}")
 
     quote do
@@ -133,7 +135,7 @@ defmodule Behave.Scenario do
       end
     end
   end
-  
+
   def __act__(scenario, {key, datum}) when is_function(datum) do
     result = datum.(scenario.data[key])
     put_in(scenario.results[key], result)
@@ -169,7 +171,8 @@ defmodule Behave.Scenario do
     end
   end
 
-  defmacro check(name, results, arguments, do: block) when is_list(arguments) and not is_list(results) do
+  defmacro check(name, results, arguments, do: block)
+           when is_list(arguments) and not is_list(results) do
     name = Behave.string_to_function_name("check_#{name}")
 
     quote do
@@ -180,7 +183,8 @@ defmodule Behave.Scenario do
     end
   end
 
-  defmacro check(name, results, data, do: block) when not is_list(data) and not is_list(results) do
+  defmacro check(name, results, data, do: block)
+           when not is_list(data) and not is_list(results) do
     name = Behave.string_to_function_name("check_#{name}")
 
     quote do
@@ -191,7 +195,8 @@ defmodule Behave.Scenario do
     end
   end
 
-  defmacro check(name, results, data, arguments, do: block) when not is_list(data) and not is_list(results) and is_list(arguments) do
+  defmacro check(name, results, data, arguments, do: block)
+           when not is_list(data) and not is_list(results) and is_list(arguments) do
     name = Behave.string_to_function_name("check_#{name}")
 
     quote do
@@ -201,7 +206,6 @@ defmodule Behave.Scenario do
       end
     end
   end
-  
 
   def run(scenario = %__MODULE__{steps: steps}) do
     steps

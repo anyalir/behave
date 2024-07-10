@@ -14,8 +14,12 @@ defmodule TestSteps do
     {:coffee_machine, &CoffeeMachine.add_coffee(&1, cultivar)}
   end
 
-  given "it has water and coffee", %{coffee_machine: coffee_machine}, amount: amount, cultivar: cultivar do
-    {:coffee_machine, coffee_machine |> CoffeeMachine.add_coffee(cultivar) |> CoffeeMachine.add_water(amount)}
+  given "it has water and coffee", %{coffee_machine: it}, amount: amount, cultivar: cultivar do
+    { :coffee_machine, 
+      it
+      |> CoffeeMachine.add_water(amount)
+      |> CoffeeMachine.add_coffee(cultivar)
+    }
   end
 
   act "i press the button", %{coffee_machine: coffee_machine} do
