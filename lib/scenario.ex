@@ -23,23 +23,11 @@ defmodule Behave.Scenario do
     end
   end
 
-  defmacro given(name, args, do: block) do
+  defmacro given(name, matches, do: block) do
     name = Behave.string_to_function_name("given_#{name}")
 
     quote do
-      def unquote(name)(scenario, unquote(args)) do
-        result = unquote(block)
-        Behave.Scenario.__given__(scenario, result)
-      end
-    end
-  end
-  
-  defmacro given(name, prerequisites, args, do: block) do
-    name = Behave.string_to_function_name("given_#{name}")
-
-    quote do
-      def unquote(name)(scenario, unquote(args)) do
-        unquote(prerequisites) = scenario.data
+      def unquote(name)(scenario, unquote(matches)) do
         result = unquote(block)
         Behave.Scenario.__given__(scenario, result)
       end
@@ -67,21 +55,17 @@ defmodule Behave.Scenario do
 
     quote do
       def unquote(name)(scenario, _) do
-        var!(data) = scenario.data
-        _ = var!(data)
         result = unquote(block)
         Behave.Scenario.__act__(scenario, result)
       end
     end
   end
 
-  defmacro act(name, args, do: block) do
+  defmacro act(name, matches, do: block) do
     name = Behave.string_to_function_name("act_#{name}")
 
     quote do
-      def unquote(name)(scenario, unquote(args)) do
-        var!(data) = scenario.data
-        _ = var!(data)
+      def unquote(name)(scenario, unquote(matches)) do
         result = unquote(block)
         Behave.Scenario.__act__(scenario, result)
       end
@@ -110,25 +94,17 @@ defmodule Behave.Scenario do
 
     quote do
       def unquote(name)(scenario, _) do
-        var!(data) = scenario.data
-        var!(results) = scenario.results
-        _ = var!(data)
-        _ = var!(results)
         unquote(block)
         scenario
       end
     end
   end
 
-  defmacro check(name, args, do: block) do
+  defmacro check(name, matches, do: block) do
     name = Behave.string_to_function_name("check_#{name}")
 
     quote do
-      def unquote(name)(scenario, unquote(args)) do
-        var!(data) = scenario.data
-        var!(results) = scenario.results
-        _ = var!(data)
-        _ = var!(results)
+      def unquote(name)(scenario, unquote(matches)) do
         unquote(block)
         scenario
       end
@@ -144,14 +120,14 @@ defmodule Behave.Scenario do
   end
 
   def run_step({:given, fun, args}, scenario = %__MODULE__{}) do
-    fun.(scenario, args)
+    fun.(scenario, %{args: args, data: scenario.data})
   end
 
   def run_step({:act, fun, args}, scenario = %__MODULE__{}) do
-    fun.(scenario, args)
+    fun.(scenario, %{args: args, data: scenario.data, results: scenario.results})
   end
 
   def run_step({:check, fun, args}, scenario = %__MODULE__{}) do
-    fun.(scenario, args)
+    fun.(scenario, %{args: args, data: scenario.data, results: scenario.results})
   end
 end

@@ -6,19 +6,19 @@ defmodule TestSteps do
     {:coffee_machine, CoffeeMachine.new()}
   end
 
-  given "it has water", amount: amount do
+  given "it has water", %{args: [amount: amount]} do
     {:coffee_machine, &CoffeeMachine.add_water(&1, amount)}
   end
 
-  given "it has coffee", cultivar: cultivar do
+  given "it has coffee", %{args: [cultivar: cultivar]} do
     {:coffee_machine, &CoffeeMachine.add_coffee(&1, cultivar)}
   end
 
-  act "i press the button" do
+  act "i press the button", %{data: data} do
     {:coffee, CoffeeMachine.brew(data.coffee_machine)}
   end
 
-  check "it makes coffee" do
+  check "it makes coffee", %{results: results} do
     assert results.coffee != :disappointment
   end
 end
