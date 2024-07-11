@@ -18,17 +18,20 @@
 Assuming you have a BDD stlye scenario like this:
 
 ```Gherkin
+
 Scenario make coffee
   Given a coffee machine
   And it has 250 ml of water in its tank
   And it has java coffee beans in its reservoir
   When i press the "make coffee" button
   Then it makes coffee
+
 ```
 
 In your ExUnit test, use the `Behave` module:
 
 ```elixir
+
 defmodule MyCoffeeMachineTest do
   use ExUnit.Case
   use Behave, steps: [MyCoffeeMachineTestSteps]
@@ -43,6 +46,7 @@ Notice we're passing `:steps` to `Behave`, this is the module where you define y
 Then, use the `Behave` DSL to implement your scenario:
 
 ```elixir
+
 defmodule MyCoffeeMachineTest do
   use ExUnit.Case
   use Behave, steps: [MyCoffeeMachineTestSteps]
@@ -55,12 +59,13 @@ defmodule MyCoffeeMachineTest do
     check "it makes coffee"
   end
 end
-```
 
+```
 Your `TestSteps` modules should be defined in a directory that gets picked up by the compiler, such as `test/support`.
 In those modules, you need to define a step function for each test step (given, act, check).
 
 ```elixir
+
 defmodule TestSteps do
     use Behave.Scenario # for access to the step definition DSL
     import ExUnit.Assertions
@@ -71,6 +76,7 @@ defmodule TestSteps do
 
     ...
 end
+
 ```
 
 The `given` macro expects you to return a tuple of an atom that will be used to refer to the returned value, and the value that should be available to subsequent steps.
@@ -80,13 +86,13 @@ In a `given` step, you have access to the values that other `givens` have emitte
 ```elixir
 # in scenario:
 
-    given "it has water", amount: 250
-    
+given "it has water", amount: 250
+
 # in step definition:
 
-    given "it has water", data, amount: amount do
-      {:coffee_machine, CoffeeMachine.add_water(data.coffee_machine, amount)}
-    end
+given "it has water", data, amount: amount do
+  {:coffee_machine, CoffeeMachine.add_water(data.coffee_machine, amount)}
+end
 
 ```
 
@@ -96,9 +102,9 @@ The value will be overwritten with this function's return value, similar to how 
 
 ```elixir
 
-    given "it has water", amount: amount do
-      {:coffee_machine, &CoffeeMachine.add_water(&1, amount)}
-    end
+given "it has water", amount: amount do
+  {:coffee_machine, &CoffeeMachine.add_water(&1, amount)}
+end
 
 ```
 
@@ -107,9 +113,9 @@ The value will be overwritten with this function's return value, similar to how 
 
 ```elixir
 
-    act "i press the button", data do
-      {:coffee, CoffeeMachine.brew(data.coffee_machine)}
-    end
+act "i press the button", data do
+  {:coffee, CoffeeMachine.brew(data.coffee_machine)}
+end
 
 ```
 Note that it is not possible to overwrite values set in `givens`. If you need to modify a value created by a `given`, use a `given`. 
@@ -118,22 +124,24 @@ The passed in data is a `Map`. You can also use pattern matching to extract valu
 
 ```elixir
 
-    given "it has water", %{coffee_machine: it}, amount: amount do
-      {:coffee_machine, CoffeeMachine.add_water(it, amount)}
-    end
+given "it has water", %{coffee_machine: it}, amount: amount do
+  {:coffee_machine, CoffeeMachine.add_water(it, amount)}
+end
 
-    act "i press the button", %{coffee_machine: it} do
-      {:coffee, CoffeeMachine.brew(it)}
-    end
+act "i press the button", %{coffee_machine: it} do
+  {:coffee, CoffeeMachine.brew(it)}
+end
 
 ```
 
 Finally, run your assertions in a `check` step:
 
 ```elixir
-    check "it makes coffee", results do
-      assert results.coffee != :disappointment
-    end
+
+check "it makes coffee", results do
+  assert results.coffee != :disappointment
+end
+
 ```
 
 `check`s cannot store any values. Their return values are always discarded. However, they have access to both the `data` and `results` maps. 
@@ -144,33 +152,39 @@ If you need to access the values emitted in `given`, they are passed in as the s
 > Note that `given` and `act` receives `data` as its first argument, but `check` receives `results` as its first argument. This is done to make the common case less verbose to write. 
 
 ```elixir
-    check "it makes coffee, when given water and coffee", results, data do
-      assert results.coffee != :disappointment
-      assert data.coffee_machine.water_ml != 0
-      assert data.coffee_machine.coffee != nil
-    end
+
+check "it makes coffee, when given water and coffee", results, data do
+  assert results.coffee != :disappointment
+  assert data.coffee_machine.water_ml != 0
+  assert data.coffee_machine.coffee != nil
+end
+
 ```
 If you need to access `data`, but not `results`, just assign `data` to `_`:
 
 ```elixir
-    check "there's still water and coffee in the machine after brewing", _, data do
-      assert data.coffee_machine.water_ml != 0
-      assert data.coffee_machine.coffee != nil
-    end
+
+check "there's still water and coffee in the machine after brewing", _, data do
+  assert data.coffee_machine.water_ml != 0
+  assert data.coffee_machine.coffee != nil
+end
+
 ```
 
 `check` can also accept arguments passed in from the scenario. These are expected to be keyword lists and will always be available as the last argument.
 
 ```elixir
-    check "it makes the right kind of coffee", results, coffee_variant: variant do
-      {:coffee, cup} = results.coffee
-      assert cup |> String.contains(variant)
-    end
 
-    check "after making coffee, the tank isnt empty", results, data, tolerable_water_remaining: rest_ml do
-      assert results.coffee != :disappointment
-      assert data.coffee_machine.water_ml >= rest_ml
-    end
+check "it makes the right kind of coffee", results, coffee_variant: variant do
+  {:coffee, cup} = results.coffee
+  assert cup |> String.contains(variant)
+end
+
+check "after making coffee, the tank isnt empty", results, data, tolerable_water_remaining: rest_ml do
+  assert results.coffee != :disappointment
+  assert data.coffee_machine.water_ml >= rest_ml
+end
+
 ```
 
 The tests created by the macros are just ExUnit tests.
@@ -196,7 +210,7 @@ by adding `behave_bdd` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:behave_bdd, "~> 0.2.0"}
+    {:behave, "~> 0.2.0", hex: :behave_bdd}
   ]
 end
 ```
