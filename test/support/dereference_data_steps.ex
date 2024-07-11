@@ -6,6 +6,10 @@ defmodule DereferenceDataSteps do
     {name, Enum.random(1..100)}
   end
 
+  given "we need to access data from a previous step", data do
+    {:previous, data[:first]}
+  end
+
   given "read the random int and copy it", %{first: int}, name: name do
     {name, int}
   end
@@ -70,5 +74,6 @@ defmodule DereferenceDataSteps do
     assert result.second_result == {{one, two}, three}
     assert data.first == one
     assert data.second == {one, two}
+    assert data.previous == one
   end
 end

@@ -12,6 +12,7 @@ defmodule DereferenceDataTest do
 
   scenario "extended DSL" do
     given "an argumment", value: :foo
+    given "we need to access data from a previous step"
     given "an argument, but the step needs to access data", value: :bar
     act "read the data, emit results"
     act "read the data, and an argument, emit results", value: :baz
