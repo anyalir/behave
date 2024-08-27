@@ -12,10 +12,11 @@
 * Not a full gherkin implementation, it just gives you the ability to decompose tests into reusable named steps.
 * Separate DSLs for defining scenarios and implementing test steps.
 * Dependency Free. Use whatever assertion, mocking and testing libraries you want.
+* Create a html report.
 
 ## Usage
 
-Assuming you have a BDD stlye scenario like this:
+Assuming you have a BDD style scenario like this:
 
 ```Gherkin
 
@@ -219,3 +220,11 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/behave_bdd>.
 
+In case that you want to make Behave to create a test report, add the following to `test/test_helper.exs`:
+
+```elixir
+Behave.Formatter.Store.start() # add
+ExUnit.configure(formatters: [ExUnit.CLIFormatter, Behave.Formatter]) # add
+
+ExUnit.start()
+```

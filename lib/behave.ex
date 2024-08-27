@@ -3,6 +3,7 @@ defmodule Behave do
   ~Ugh baby, `Behave`!
   Simple BDD style tests for elixir.
   """
+  alias Behave.Formatter
   alias Behave.Scenario
 
   defmacro __using__(opts) do
@@ -25,6 +26,8 @@ defmodule Behave do
   end
 
   defmacro scenario(title, do: block) do
+    store_scenario(title, block)
+
     quote do
       test unquote(title) do
         var!(scenario) = Behave.Scenario.new()
@@ -100,5 +103,18 @@ defmodule Behave do
     |> String.trim()
     |> String.replace(" ", "_")
     |> String.to_atom()
+  end
+
+  defp store_scenario(title, block) do
+    steps =
+      block
+      |> elem(2)
+      |> Enum.map(fn step ->
+        {action, _, [title | params]} = step
+
+        %Formatter.Step{action: action, title: title, params: params}
+      end)
+
+    Formatter.Store.add_scenario(%Formatter.Scenario{title: title, steps: steps})
   end
 end

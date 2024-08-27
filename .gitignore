@@ -25,5 +25,8 @@ behave-*.tar
 # Temporary files, for example, from tests.
 /tmp/
 
+# Html test report
+behave.html
+
 .vscode
 
