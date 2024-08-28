@@ -4,7 +4,7 @@ defmodule Behave.Formatter.HtmlRenderer do
   end
 
   def report_name do
-    Application.get_env(:behave, :report_name, "behave.html")
+    Application.get_env(:behave, :report_name, "behave_report.html")
   end
 
   defp render(scenarios) do

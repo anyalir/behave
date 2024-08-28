@@ -12,7 +12,7 @@
 * Not a full gherkin implementation, it just gives you the ability to decompose tests into reusable named steps.
 * Separate DSLs for defining scenarios and implementing test steps.
 * Dependency Free. Use whatever assertion, mocking and testing libraries you want.
-* Create a html report.
+* Html report including all test steps.
 
 ## Usage
 
@@ -191,6 +191,29 @@ end
 The tests created by the macros are just ExUnit tests.
 To run your tests, just `mix test` them 🎉
 
+## HTML Report
+
+Behave has a reporter for `ExUnit` that generates a html report from your tests. 
+To use it, add it to your reporters like so
+
+```elixir
+# test/test_helper.exs
+
+Behave.Formatter.Store.start() # add
+ExUnit.configure(formatters: [ExUnit.CLIFormatter, Behave.Formatter]) # add
+
+ExUnit.start()
+
+```
+and add a configuration value that tells it what to name the report file:
+
+```elixir
+# config/config.exs
+config :behave,
+    report_name: "my_report_name.html"
+
+```
+
 ## Migrating from 0.1.x
 
 * It is no longer necessary to return `:ignore` from `given` and `act`. Any value returned that is not wrapped in a tuple will be discarded.
@@ -220,11 +243,3 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at <https://hexdocs.pm/behave_bdd>.
 
-In case that you want to make Behave to create a test report, add the following to `test/test_helper.exs`:
-
-```elixir
-Behave.Formatter.Store.start() # add
-ExUnit.configure(formatters: [ExUnit.CLIFormatter, Behave.Formatter]) # add
-
-ExUnit.start()
-```
